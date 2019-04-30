@@ -1,0 +1,16 @@
+name: webdav
+version: 1.0.0-dev
+
+description: easy webdav for dart
+
+environment:
+  sdk: ">=2.1.0 <3.0.0"
+
+dependencies:
+  retry: ^2.0.0
+  xml: ^3.3.1
+  xml2json: ^3.0.3
+
+dev_dependencies:
+  pedantic: ^1.2.0
+  test: '>=1.0.0 <2.0.0'
