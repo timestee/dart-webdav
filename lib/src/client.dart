@@ -175,7 +175,7 @@ class Client {
     HttpClientResponse response = await this
         ._send('PROPFIND', remotePath, [207, 301], headers: userHeader);
     if (response.statusCode == 301) {
-      this.ls(response.headers.value('location'));
+      return this.ls(response.headers.value('location'));
     }
     return treeFromWevDavXml(await response.transform(utf8.decoder).join());
   }
