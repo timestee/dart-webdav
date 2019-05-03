@@ -1,7 +1,10 @@
 name: webdav
 version: 1.0.0-dev
 
+author: Tee <wanghuidev@gmail.com>
+
 description: easy webdav for dart
+homepage: https://github.com/zsounder/dart-webdav
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
