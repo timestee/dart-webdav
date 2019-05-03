@@ -3,7 +3,7 @@ version: 1.0.0-dev
 
 author: Tee <wanghuidev@gmail.com>
 
-description: easy webdav for dart
+description: easy webdav for dart,support basic auth,directories\files listing,upload\downliad.
 homepage: https://github.com/zsounder/dart-webdav
 
 environment:
