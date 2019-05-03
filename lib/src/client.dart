@@ -124,13 +124,8 @@ class Client {
     String oldCwd = this.cwd;
     try {
       for (String dir in dirs) {
-        HttpClientResponse response;
         try {
-          response = await this.mkdir(dir, true);
-        } catch (e) {
-          if (response.statusCode == 409) {
-            throw e;
-          }
+          await this.mkdir(dir, true);
         } finally {
           this.cd(dir);
         }
@@ -146,15 +141,15 @@ class Client {
     if (safe) {
       expectedCodes.addAll([204, 404]);
     }
-    this._send('DELETE', path, expectedCodes);
+    await this._send('DELETE', path, expectedCodes);
   }
 
   void delete(String path) async {
-    this._send('DELETE', path, [204]);
+    await this._send('DELETE', path, [204]);
   }
 
   void _upload(Uint8List localData, String remotePath) async {
-    this._send('PUT', remotePath, [200, 201, 204], data: localData);
+    await this._send('PUT', remotePath, [200, 201, 204], data: localData);
   }
 
   void upload(Uint8List data, String remotePath) async {
@@ -167,7 +162,7 @@ class Client {
 
   void download(String remotePath, String localFilePath) async {
     HttpClientResponse response = await this._send('GET', remotePath, [200]);
-    response.pipe(new File(localFilePath).openWrite());
+    await response.pipe(new File(localFilePath).openWrite());
   }
 
   Future<String> downloadToBinaryString(String remotePath) async {
