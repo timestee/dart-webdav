@@ -14,6 +14,7 @@ class FileInfo {
   bool get isDict => this.contentType == 'httpd/unix-directory';
 }
 
+/// get filed [name] from the property node
 String prop(dynamic prop, String name, [String defaultVal]) {
   if (prop is Map) {
     final val = prop['d:' + name];
@@ -25,6 +26,7 @@ String prop(dynamic prop, String name, [String defaultVal]) {
   return defaultVal;
 }
 
+/// get file info list from `ls` command response
 List<FileInfo> treeFromWevDavXml(String xmlStr) {
   final Xml2Json myTransformer = Xml2Json();
   myTransformer.parse(xmlStr);

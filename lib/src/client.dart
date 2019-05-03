@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+
 import 'package:retry/retry.dart';
+
 import 'file.dart';
 
 class WebDavException implements Exception {
@@ -21,6 +23,8 @@ class Client {
   String cwd = "/";
   HttpClient httpClient = new HttpClient();
 
+  /// Construct a new [Client].
+  /// [path] will should be the root path you want to access.
   Client(String host, String username, String password, String path,
       {String protocol, int port}) {
     if (port == null) {
@@ -40,6 +44,7 @@ class Client {
         HttpClientBasicCredentials(username, password));
   }
 
+  /// get url from given [path]
   String getUrl(String path) {
     path = path.trim();
     if (path.startsWith('/')) {
@@ -48,6 +53,7 @@ class Client {
     return [this.baseUrl, this.cwd, path].join('');
   }
 
+  /// change current dir to the given [path]
   void cd(String path) {
     path = path.trim();
     if (path.isEmpty) {
@@ -65,6 +71,8 @@ class Client {
     }
   }
 
+  /// send the request with given [method] and [path]
+  ///
   Future<HttpClientResponse> _send(
       String method, String path, List<int> expectedCodes,
       {Uint8List data, Map headers}) async {
@@ -75,6 +83,7 @@ class Client {
         maxAttempts: 5);
   }
 
+  /// send the request with given [method] and [path]
   Future<HttpClientResponse> __send(
       String method, String path, List<int> expectedCodes,
       {Uint8List data, Map headers}) async {
@@ -103,6 +112,7 @@ class Client {
     return response;
   }
 
+  /// make a dir with [path] under current dir
   Future<HttpClientResponse> mkdir(String path, [bool safe = true]) {
     List<int> expectedCodes = [201];
     if (safe) {
@@ -111,6 +121,7 @@ class Client {
     return this._send('MKCOL', path, expectedCodes);
   }
 
+  /// just like mkdir -p
   void mkdirs(String path) async {
     path = path.trim();
     List<String> dirs = path.split("/");
@@ -135,6 +146,7 @@ class Client {
     }
   }
 
+  /// remove dir with given [path]
   void rmdir(String path, [bool safe = true]) async {
     path = path.trim();
     List<int> expectedCodes = [204];
@@ -144,32 +156,39 @@ class Client {
     await this._send('DELETE', path, expectedCodes);
   }
 
+  /// remove dir with given [path]
   void delete(String path) async {
     await this._send('DELETE', path, [204]);
   }
 
+  /// upload a new file with [localData] as content to [remotePath]
   void _upload(Uint8List localData, String remotePath) async {
     await this._send('PUT', remotePath, [200, 201, 204], data: localData);
   }
 
+  /// upload a new file with [localData] as content to [remotePath]
   void upload(Uint8List data, String remotePath) async {
     this._upload(data, remotePath);
   }
 
+  /// upload local file [path] to [remotePath]
   void uploadFile(String path, String remotePath) async {
     this._upload(await File(path).readAsBytes(), remotePath);
   }
 
+  /// download [remotePath] to local file [localFilePath]
   void download(String remotePath, String localFilePath) async {
     HttpClientResponse response = await this._send('GET', remotePath, [200]);
     await response.pipe(new File(localFilePath).openWrite());
   }
 
+  /// download [remotePath] and store the response file contents to String
   Future<String> downloadToBinaryString(String remotePath) async {
     HttpClientResponse response = await this._send('GET', remotePath, [200]);
     return response.transform(utf8.decoder).join();
   }
 
+  /// list the directories and files under given [remotePath]
   Future<List<FileInfo>> ls(String remotePath) async {
     Map userHeader = {"Depth": 1};
     HttpClientResponse response = await this
