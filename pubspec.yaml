@@ -1,10 +1,10 @@
 name: webdav
 version: 1.0.4-dev
 
-author: Tee <wanghuidev@gmail.com>
+author: timestee
 
 description: easy webdav for dart,support basic auth,directories\files listing,upload\downliad.
-homepage: https://github.com/zsounder/dart-webdav
+homepage: https://github.com/timestee/dart-webdav
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
