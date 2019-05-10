@@ -8,6 +8,7 @@ import 'file.dart';
 
 class WebDavException implements Exception {
   String cause;
+
   WebDavException(this.cause);
 }
 
@@ -77,7 +78,7 @@ class Client {
       String method, String path, List<int> expectedCodes,
       {Uint8List data, Map headers}) async {
     return await retry(
-            () => this
+        () => this
             .__send(method, path, expectedCodes, data: data, headers: headers),
         retryIf: (e) => e is WebDavException,
         maxAttempts: 5);
@@ -91,7 +92,7 @@ class Client {
     print("[wevdav] http send with method:$method path:$path url:$url");
 
     HttpClientRequest request =
-    await this.httpClient.openUrl(method, Uri.parse(url));
+        await this.httpClient.openUrl(method, Uri.parse(url));
     request
       ..followRedirects = false
       ..persistentConnection = true;
