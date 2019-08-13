@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:xml2json/xml2json.dart';
+import 'package:xml/xml.dart' as xml;
 
 class FileInfo {
   String name;
@@ -46,4 +47,14 @@ List<FileInfo> treeFromWevDavXml(String xmlStr) {
     });
   }
   return tree;
+}
+
+List<FileInfo> treeFromWevDavXmlNew(String xmlStr) {
+  var xmlDocument = xml.parse(xmlStr);
+  var responseList = xmlDocument.findAllElements("D:response").toList();
+
+  responseList.forEach((response) {
+    var davItemName = response.findElements("D:href").single.text;
+    print(davItemName);
+  });
 }
