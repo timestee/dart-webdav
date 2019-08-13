@@ -17,7 +17,7 @@ class FileInfo {
 /// get filed [name] from the property node
 String prop(dynamic prop, String name, [String defaultVal]) {
   if (prop is Map) {
-    final val = prop['d:' + name];
+    final val = prop['D:' + name];
     if (val == null) {
       return defaultVal;
     }
@@ -31,13 +31,13 @@ List<FileInfo> treeFromWevDavXml(String xmlStr) {
   final Xml2Json myTransformer = Xml2Json();
   myTransformer.parse(xmlStr);
   final jsonResponse = json.decode(myTransformer.toParker());
-  final responses = jsonResponse['d:multistatus']['d:response'];
+  final responses = jsonResponse['D:multistatus']['D:response'];
   var tree = new List<FileInfo>();
   if (responses is List) {
     responses.forEach((response) {
-      final elem = response['d:propstat']['d:prop'];
+      final elem = response['D:propstat']['D:prop'];
       FileInfo f = FileInfo(
-          response['d:href'],
+          response['D:href'],
           prop(elem, 'getcontentlength'),
           prop(elem, 'getlastmodified'),
           prop(elem, 'creationdate'),
