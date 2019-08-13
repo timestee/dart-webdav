@@ -28,7 +28,7 @@ String prop(dynamic prop, String name, [String defaultVal]) {
 }
 
 /// get file info list from `ls` command response
-List<FileInfo> treeFromWevDavXml(String xmlStr) {
+List<FileInfo> treeFromWevDavXmlOld(String xmlStr) {
   final Xml2Json myTransformer = Xml2Json();
   myTransformer.parse(xmlStr);
   final jsonResponse = json.decode(myTransformer.toParker());
@@ -49,7 +49,7 @@ List<FileInfo> treeFromWevDavXml(String xmlStr) {
   return tree;
 }
 
-List<FileInfo> treeFromWevDavXmlNew(String xmlStr) {
+List<FileInfo> treeFromWevDavXml(String xmlStr) {
   var xmlDocument = xml.parse(xmlStr);
   var responseList = xmlDocument.findAllElements("D:response").toList();
 
