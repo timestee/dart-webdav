@@ -9,4 +9,3 @@ A Easy WebDAV Client in Dart
 
 ## TODO
 * testcase
-* parse the `LIST` xml response rather using xmltojson to do that
