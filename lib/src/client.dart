@@ -38,7 +38,7 @@ class Client {
       this.baseUrl += "/";
     }
     this.path = path;
-    if (this.path.isNotEmpty) {
+    if (this.path.isNotEmpty && this.path != "/") {
       this.baseUrl = this.baseUrl + this.path;
     }
     this.httpClient.addCredentials(Uri.parse(this.baseUrl), "",
@@ -48,10 +48,15 @@ class Client {
   /// get url from given [path]
   String getUrl(String path) {
     path = path.trim();
+
     if (path.startsWith('/')) {
-      return this.baseUrl + path;
+      // Since the base url ends with "/" by default trim of one char at the
+      // beginning of the path
+      return this.baseUrl + path.substring(1, path.length);
     }
-    return [this.baseUrl, this.cwd, path].join('');
+
+    // If the path does not start with "/" append it after the baseUrl
+    return [this.baseUrl, path].join('');
   }
 
   /// change current dir to the given [path]
