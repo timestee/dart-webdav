@@ -94,7 +94,7 @@ class Client {
       String method, String path, List<int> expectedCodes,
       {Uint8List data, Map headers}) async {
     String url = this.getUrl(path);
-    print("[wevdav] http send with method:$method path:$path url:$url");
+    print("[webdav] http send with method:$method path:$path url:$url");
 
     HttpClientRequest request =
         await this.httpClient.openUrl(method, Uri.parse(url));
@@ -195,13 +195,13 @@ class Client {
   }
 
   /// list the directories and files under given [remotePath]
-  Future<List<FileInfo>> ls(String remotePath) async {
-    Map userHeader = {"Depth": 1};
+  Future<List<FileInfo>> ls(String remotePath, {int depth = 1}) async {
+    Map userHeader = {"Depth": depth};
     HttpClientResponse response = await this
         ._send('PROPFIND', remotePath, [207, 301], headers: userHeader);
     if (response.statusCode == 301) {
       return this.ls(response.headers.value('location'));
     }
-    return treeFromWevDavXml(await response.transform(utf8.decoder).join());
+    return treeFromWebDavXml(await response.transform(utf8.decoder).join());
   }
 }
