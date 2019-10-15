@@ -128,7 +128,7 @@ class Client {
   }
 
   /// just like mkdir -p
-  void mkdirs(String path) async {
+  Future mkdirs(String path) async {
     path = path.trim();
     List<String> dirs = path.split("/");
     dirs.removeWhere((value) => value == null || value == '');
@@ -153,7 +153,7 @@ class Client {
   }
 
   /// remove dir with given [path]
-  void rmdir(String path, [bool safe = true]) async {
+  Future rmdir(String path, [bool safe = true]) async {
     path = path.trim();
     List<int> expectedCodes = [204];
     if (safe) {
@@ -163,27 +163,27 @@ class Client {
   }
 
   /// remove dir with given [path]
-  void delete(String path) async {
+  Future delete(String path) async {
     await this._send('DELETE', path, [204]);
   }
 
   /// upload a new file with [localData] as content to [remotePath]
-  void _upload(Uint8List localData, String remotePath) async {
+  Future _upload(Uint8List localData, String remotePath) async {
     await this._send('PUT', remotePath, [200, 201, 204], data: localData);
   }
 
   /// upload a new file with [localData] as content to [remotePath]
-  void upload(Uint8List data, String remotePath) async {
+  Future upload(Uint8List data, String remotePath) async {
     this._upload(data, remotePath);
   }
 
   /// upload local file [path] to [remotePath]
-  void uploadFile(String path, String remotePath) async {
+  Future uploadFile(String path, String remotePath) async {
     this._upload(await File(path).readAsBytes(), remotePath);
   }
 
   /// download [remotePath] to local file [localFilePath]
-  void download(String remotePath, String localFilePath) async {
+  Future download(String remotePath, String localFilePath) async {
     HttpClientResponse response = await this._send('GET', remotePath, [200]);
     await response.pipe(new File(localFilePath).openWrite());
   }
