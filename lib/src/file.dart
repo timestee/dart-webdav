@@ -13,15 +13,11 @@ class FileInfo {
   // Returns the decoded name of the file / folder without the whole path
   String get name {
     if (this.isDirectory) {
-      return Uri.decodeFull(this.path
-          .substring(0, this.path.lastIndexOf("/"))
-          .split("/")
-          .last);
+      return Uri.decodeFull(
+          this.path.substring(0, this.path.lastIndexOf("/")).split("/").last);
     }
 
-    return Uri.decodeFull(this.path
-        .split("/")
-        .last);
+    return Uri.decodeFull(this.path.split("/").last);
   }
 
   bool get isDirectory => this.path.endsWith("/");
@@ -44,7 +40,7 @@ String prop(dynamic prop, String name, [String defaultVal]) {
   return defaultVal;
 }
 
-List<FileInfo> treeFromWevDavXml(String xmlStr) {
+List<FileInfo> treeFromWebDavXml(String xmlStr) {
   // Initialize a list to store the FileInfo Objects
   var tree = new List<FileInfo>();
 
@@ -52,28 +48,28 @@ List<FileInfo> treeFromWevDavXml(String xmlStr) {
   var xmlDocument = xml.parse(xmlStr);
 
   // Iterate over the response to find all folders / files and parse the information
-  xmlDocument.findAllElements("D:response").forEach((response) {
-    var davItemName = response.findElements("D:href").single.text;
-    response
-        .findElements("D:propstat")
-        .single
-        .findElements("D:prop")
+  findAllElementsFromDocument(xmlDocument, "response").forEach((response) {
+    var davItemName = findElementsFromElement(response, "href").single.text;
+    findElementsFromElement(
+            findElementsFromElement(response, "propstat").first, "prop")
         .forEach((element) {
-      var contentLength =
-          element
-              .findElements("D:getcontentlength")
-              .single
-              .text;
+      final contentLengthElements =
+          findElementsFromElement(element, "getcontentlength");
+      final contentLength = contentLengthElements.isNotEmpty
+          ? contentLengthElements.single.text
+          : "";
 
-      var lastModified = element
-          .findElements("D:getlastmodified")
-          .single
-          .text;
+      final lastModifiedElements =
+          findElementsFromElement(element, "getlastmodified");
+      final lastModified = lastModifiedElements.isNotEmpty
+          ? lastModifiedElements.single.text
+          : "";
 
-      var creationTime = element
-          .findElements("D:creationdate")
-          .single
-          .text;
+      final creationTimeElements =
+          findElementsFromElement(element, "creationdate");
+      final creationTime = creationTimeElements.isNotEmpty
+          ? creationTimeElements.single.text
+          : DateTime.fromMillisecondsSinceEpoch(0).toIso8601String();
 
       // Add the just found file to the tree
       tree.add(new FileInfo(davItemName, contentLength, lastModified,
@@ -84,3 +80,13 @@ List<FileInfo> treeFromWevDavXml(String xmlStr) {
   // Return the tree
   return tree;
 }
+
+List<xml.XmlElement> findAllElementsFromDocument(
+        xml.XmlDocument document, String tag) =>
+    (document.findAllElements("d:$tag").toList()
+      ..addAll(document.findAllElements("D:$tag")));
+
+List<xml.XmlElement> findElementsFromElement(
+        xml.XmlElement element, String tag) =>
+    (element.findElements("d:$tag").toList()
+      ..addAll(element.findElements("D:$tag")));
