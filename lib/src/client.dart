@@ -9,7 +9,7 @@ import 'file.dart';
 class WebDavException implements Exception {
   String cause;
   int statusCode;
-  
+
   WebDavException(this.cause, this.statusCode);
 }
 
@@ -29,9 +29,12 @@ class Client {
   /// [path] will should be the root path you want to access.
   Client(String host, String username, String password, String path,
       {String protocol, int port}) {
-    if (port == null) {
+    this.baseUrl = host;
+    if (!host.startsWith("https://") && !host.startsWith("http://") &&
+        protocol != "") {
       this.baseUrl = "$protocol://$host";
-    } else {
+    }
+    if (port != null) {
       this.baseUrl = "$protocol://$host:$port";
     }
 
@@ -80,25 +83,27 @@ class Client {
 
   /// send the request with given [method] and [path]
   ///
-  Future<HttpClientResponse> _send(
-      String method, String path, List<int> expectedCodes,
+  Future<HttpClientResponse> _send(String method, String path,
+      List<int> expectedCodes,
       {Uint8List data, Map headers}) async {
     return await retry(
-        () => this
-            .__send(method, path, expectedCodes, data: data, headers: headers),
+            () =>
+            this
+                .__send(
+                method, path, expectedCodes, data: data, headers: headers),
         retryIf: (e) => e is WebDavException,
         maxAttempts: 5);
   }
 
   /// send the request with given [method] and [path]
-  Future<HttpClientResponse> __send(
-      String method, String path, List<int> expectedCodes,
+  Future<HttpClientResponse> __send(String method, String path,
+      List<int> expectedCodes,
       {Uint8List data, Map headers}) async {
     String url = this.getUrl(path);
     print("[webdav] http send with method:$method path:$path url:$url");
 
     HttpClientRequest request =
-        await this.httpClient.openUrl(method, Uri.parse(url));
+    await this.httpClient.openUrl(method, Uri.parse(url));
     request
       ..followRedirects = false
       ..persistentConnection = true;
@@ -196,12 +201,16 @@ class Client {
   }
 
   /// list the directories and files under given [remotePath]
-  Future<List<FileInfo>> ls(String remotePath, {int depth = 1}) async {
+  Future<List<FileInfo>> ls({String path, int depth = 1}) async {
+    // the current path
+    if (path == null || path == ".") {
+      path = "";
+    }
     Map userHeader = {"Depth": depth};
     HttpClientResponse response = await this
-        ._send('PROPFIND', remotePath, [207, 301], headers: userHeader);
+        ._send('PROPFIND', path, [207, 301], headers: userHeader);
     if (response.statusCode == 301) {
-      return this.ls(response.headers.value('location'));
+      return this.ls(path: response.headers.value('location'));
     }
     return treeFromWebDavXml(await response.transform(utf8.decoder).join());
   }
