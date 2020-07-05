@@ -82,11 +82,7 @@ List<FileInfo> treeFromWebDavXml(String xmlStr) {
 }
 
 List<xml.XmlElement> findAllElementsFromDocument(
-        xml.XmlDocument document, String tag) =>
-    (document.findAllElements("d:$tag").toList()
-      ..addAll(document.findAllElements("D:$tag")));
+        xml.XmlDocument document, String tag) => document.findAllElements(tag, namespace: '*').toList();
 
 List<xml.XmlElement> findElementsFromElement(
-        xml.XmlElement element, String tag) =>
-    (element.findElements("d:$tag").toList()
-      ..addAll(element.findElements("D:$tag")));
+        xml.XmlElement element, String tag) => element.findElements(tag, namespace: '*').toList();
