@@ -60,7 +60,7 @@ class Client {
     }
 
     // If the path does not start with "/" append it after the baseUrl
-    return [this.baseUrl, path].join('');
+    return [this.baseUrl, this.cwd, path].join('');
   }
 
   /// change current dir to the given [path]
@@ -141,6 +141,7 @@ class Client {
     if (dirs.isEmpty) {
       return;
     }
+    print(dirs);
     if (path.startsWith("/")) {
       dirs[0] = '/' + dirs[0];
     }

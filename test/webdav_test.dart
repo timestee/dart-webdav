@@ -5,8 +5,8 @@ import 'package:webdav/webdav.dart' as webdav;
 void main() {
   webdav.Client client =  webdav.Client(
     "https://dav.jianguoyun.com/dav/",
-    "username",
-    "password",
+    "wanghuidev@gmail.com",
+    "a7arqs48rr7xcn4k",
     "tmp"
   );
 
@@ -16,5 +16,8 @@ void main() {
       print(item.path);
       print("     - ${item.contentType} | ${item.size},  | ${item.creationTime},  | ${item.modificationTime}");
     }
+  });
+  test('mkdirs command', () async {
+    client.mkdirs("test0/test1/test2");
   });
 }
