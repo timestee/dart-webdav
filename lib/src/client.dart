@@ -63,7 +63,7 @@ class Client {
     return [this.baseUrl, this.cwd, path].join('');
   }
 
-  /// change current dir to the given [path]
+  /// change current dir to the given [path], you should make sure the dir exist
   void cd(String path) {
     path = path.trim();
     if (path.isEmpty) {
@@ -141,7 +141,6 @@ class Client {
     if (dirs.isEmpty) {
       return;
     }
-    print(dirs);
     if (path.startsWith("/")) {
       dirs[0] = '/' + dirs[0];
     }
