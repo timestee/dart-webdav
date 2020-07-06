@@ -18,9 +18,9 @@ void main() {
     }
   });
   test('mkdir & mkdirs &cd & rmdir command', () async {
-    client.mkdir("test0");
-    client.cd("test0");
-    client.mkdirs("test1/test2");
-    client.rmdir("/test0");
+    await client.mkdir("test0");
+    await client.cd("test0");
+    await client.mkdirs("test1/test2");
+    await client.rmdir("/test0");
   });
 }

@@ -56,7 +56,7 @@ class Client {
     if (path.startsWith('/')) {
       // Since the base url ends with "/" by default trim of one char at the
       // beginning of the path
-      return this.baseUrl + path.substring(1, path.length);
+      return this.baseUrl + path;
     }
 
     // If the path does not start with "/" append it after the baseUrl
