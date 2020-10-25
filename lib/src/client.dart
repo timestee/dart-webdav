@@ -161,6 +161,11 @@ class Client {
   /// remove dir with given [path]
   Future rmdir(String path, [bool safe = true]) async {
     path = path.trim();
+    if (!path.endsWith('/')) {
+      // Apache is unhappy when directory to be deleted
+      // does not end with '/'
+      path += '/';
+    }
     List<int> expectedCodes = [204];
     if (safe) {
       expectedCodes.addAll([204, 404]);
