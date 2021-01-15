@@ -185,12 +185,12 @@ class Client {
 
   /// upload a new file with [localData] as content to [remotePath]
   Future upload(Uint8List data, String remotePath) async {
-    this._upload(data, remotePath);
+    await this._upload(data, remotePath);
   }
 
   /// upload local file [path] to [remotePath]
   Future uploadFile(String path, String remotePath) async {
-    this._upload(await File(path).readAsBytes(), remotePath);
+    await this._upload(await File(path).readAsBytes(), remotePath);
   }
 
   /// download [remotePath] to local file [localFilePath]
