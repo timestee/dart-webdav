@@ -14,23 +14,23 @@ class WebDavException implements Exception {
 }
 
 class Client {
-  String host;
-  int port;
-  String username;
-  String password;
+  final HttpClient httpClient = new HttpClient();
+  late String host;
+  late int port;
+  late String username;
+  late String password;
+  late String path;
+  late String baseUrl;
   String protocol = 'http';
-  bool verifySsl = true;
-  String path;
-  String baseUrl;
   String cwd = "/";
-  HttpClient httpClient = new HttpClient();
 
   /// Construct a new [Client].
   /// [path] will should be the root path you want to access.
   Client(String host, String username, String password, String path,
-      {String protocol, int port}) {
+      {String? protocol, int? port}) {
     this.baseUrl = host;
-    if (!host.startsWith("https://") && !host.startsWith("http://") &&
+    if (!host.startsWith("https://") &&
+        !host.startsWith("http://") &&
         protocol != "") {
       this.baseUrl = "$protocol://$host";
     }
@@ -83,27 +83,25 @@ class Client {
 
   /// send the request with given [method] and [path]
   ///
-  Future<HttpClientResponse> _send(String method, String path,
-      List<int> expectedCodes,
-      {Uint8List data, Map headers}) async {
+  Future<HttpClientResponse> _send(
+      String method, String path, List<int> expectedCodes,
+      {Uint8List? data, Map? headers}) async {
     return await retry(
-            () =>
-            this
-                .__send(
-                method, path, expectedCodes, data: data, headers: headers),
+        () => this
+            .__send(method, path, expectedCodes, data: data, headers: headers),
         retryIf: (e) => e is WebDavException,
         maxAttempts: 5);
   }
 
   /// send the request with given [method] and [path]
-  Future<HttpClientResponse> __send(String method, String path,
-      List<int> expectedCodes,
-      {Uint8List data, Map headers}) async {
+  Future<HttpClientResponse> __send(
+      String method, String path, List<int> expectedCodes,
+      {Uint8List? data, Map? headers}) async {
     String url = this.getUrl(path);
     print("[webdav] http send with method:$method path:$path url:$url");
 
     HttpClientRequest request =
-    await this.httpClient.openUrl(method, Uri.parse(url));
+        await this.httpClient.openUrl(method, Uri.parse(url));
     request
       ..followRedirects = false
       ..persistentConnection = true;
@@ -117,9 +115,11 @@ class Client {
 
     HttpClientResponse response = await request.close();
     if (!expectedCodes.contains(response.statusCode)) {
-      throw WebDavException("operation failed method:$method "
+      throw WebDavException(
+          "operation failed method:$method "
           "path:$path exceptionCodes:$expectedCodes "
-          "statusCode:${response.statusCode}", response.statusCode);
+          "statusCode:${response.statusCode}",
+          response.statusCode);
     }
     return response;
   }
@@ -137,7 +137,7 @@ class Client {
   Future mkdirs(String path) async {
     path = path.trim();
     List<String> dirs = path.split("/");
-    dirs.removeWhere((value) => value == null || value == '');
+    dirs.removeWhere((value) => value == '');
     if (dirs.isEmpty) {
       return;
     }
@@ -206,14 +206,14 @@ class Client {
   }
 
   /// list the directories and files under given [remotePath]
-  Future<List<FileInfo>> ls({String path, int depth = 1}) async {
+  Future<List<FileInfo>> ls({String? path, int depth = 1}) async {
     // the current path
     if (path == null || path == ".") {
       path = "";
     }
     Map userHeader = {"Depth": depth};
-    HttpClientResponse response = await this
-        ._send('PROPFIND', path, [207, 301], headers: userHeader);
+    HttpClientResponse response =
+        await this._send('PROPFIND', path, [207, 301], headers: userHeader);
     if (response.statusCode == 301) {
       return this.ls(path: response.headers.value('location'));
     }

@@ -1,4 +1,5 @@
 import 'package:xml/xml.dart' as xml;
+import 'package:xml/xml.dart';
 
 class FileInfo {
   String path;
@@ -29,7 +30,7 @@ class FileInfo {
 }
 
 /// get filed [name] from the property node
-String prop(dynamic prop, String name, [String defaultVal]) {
+String? prop(dynamic prop, String name, [String? defaultVal]) {
   if (prop is Map) {
     final val = prop['D:' + name];
     if (val == null) {
@@ -42,10 +43,10 @@ String prop(dynamic prop, String name, [String defaultVal]) {
 
 List<FileInfo> treeFromWebDavXml(String xmlStr) {
   // Initialize a list to store the FileInfo Objects
-  var tree = new List<FileInfo>();
+  List<FileInfo> tree = new List.empty(growable: true);
 
   // parse the xml using the xml.parse method
-  var xmlDocument = xml.parse(xmlStr);
+  var xmlDocument = XmlDocument.parse(xmlStr);
 
   // Iterate over the response to find all folders / files and parse the information
   findAllElementsFromDocument(xmlDocument, "response").forEach((response) {
@@ -82,7 +83,9 @@ List<FileInfo> treeFromWebDavXml(String xmlStr) {
 }
 
 List<xml.XmlElement> findAllElementsFromDocument(
-        xml.XmlDocument document, String tag) => document.findAllElements(tag, namespace: '*').toList();
+        xml.XmlDocument document, String tag) =>
+    document.findAllElements(tag, namespace: '*').toList();
 
 List<xml.XmlElement> findElementsFromElement(
-        xml.XmlElement element, String tag) => element.findElements(tag, namespace: '*').toList();
+        xml.XmlElement element, String tag) =>
+    element.findElements(tag, namespace: '*').toList();
