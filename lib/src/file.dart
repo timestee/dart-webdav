@@ -1,5 +1,4 @@
 import 'package:xml/xml.dart' as xml;
-import 'package:xml/xml.dart';
 
 class FileInfo {
   String path;
@@ -46,7 +45,7 @@ List<FileInfo> treeFromWebDavXml(String xmlStr) {
   List<FileInfo> tree = new List.empty(growable: true);
 
   // parse the xml using the xml.parse method
-  var xmlDocument = XmlDocument.parse(xmlStr);
+  var xmlDocument = xml.XmlDocument.parse(xmlStr);
 
   // Iterate over the response to find all folders / files and parse the information
   findAllElementsFromDocument(xmlDocument, "response").forEach((response) {
