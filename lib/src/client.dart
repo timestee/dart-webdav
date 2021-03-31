@@ -15,53 +15,32 @@ class WebDavException implements Exception {
 
 class Client {
   final HttpClient httpClient = new HttpClient();
-  late String host;
-  late int port;
-  late String username;
-  late String password;
-  late String path;
-  late String baseUrl;
-  String protocol = 'http';
-  String cwd = "/";
+  late String _baseUrl;
+  String _cwd = '/';
 
   /// Construct a new [Client].
   /// [path] will should be the root path you want to access.
-  Client(String host, String username, String password, String path,
-      {String? protocol, int? port}) {
-    this.baseUrl = host;
-    if (!host.startsWith("https://") &&
-        !host.startsWith("http://") &&
-        protocol != "") {
-      this.baseUrl = "$protocol://$host";
-    }
-    if (port != null) {
-      this.baseUrl = "$protocol://$host:$port";
-    }
-
-    if (!this.baseUrl.endsWith("/")) {
-      this.baseUrl += "/";
-    }
-    this.path = path;
-    if (this.path.isNotEmpty && this.path != "/") {
-      this.baseUrl = this.baseUrl + this.path;
-    }
-    this.httpClient.addCredentials(Uri.parse(this.baseUrl), "",
-        HttpClientBasicCredentials(username, password));
+  Client(
+    String host,
+    String user,
+    String password, {
+    String? path,
+    String? protocol,
+    int? port,
+  }) : assert((host.startsWith('https://') ||
+            host.startsWith('http://') ||
+            protocol != null)) {
+    _baseUrl = (protocol != null
+            ? '$protocol://$host${port != null ? ':$port' : ''}'
+            : host) +
+        (path ?? '');
+    this.httpClient.addCredentials(
+        Uri.parse(_baseUrl), '', HttpClientBasicCredentials(user, password));
   }
 
   /// get url from given [path]
-  String getUrl(String path) {
-    path = path.trim();
-
-    if (path.startsWith('/')) {
-      // Since the base url ends with "/" by default trim of one char at the
-      // beginning of the path
-      return this.baseUrl + path;
-    }
-
-    // If the path does not start with "/" append it after the baseUrl
-    return [this.baseUrl, this.cwd, path].join('');
-  }
+  String getUrl(String path) =>
+      path.startsWith('/') ? _baseUrl + path : '$_baseUrl$_cwd$path';
 
   /// change current dir to the given [path], you should make sure the dir exist
   void cd(String path) {
@@ -73,11 +52,11 @@ class Client {
     tmp.removeWhere((value) => value == null || value == '');
     String strippedPath = tmp.join('/') + '/';
     if (strippedPath == '/') {
-      this.cwd = strippedPath;
+      _cwd = strippedPath;
     } else if (path.startsWith("/")) {
-      this.cwd = '/' + strippedPath;
+      _cwd = '/' + strippedPath;
     } else {
-      this.cwd += strippedPath;
+      _cwd += strippedPath;
     }
   }
 
@@ -144,7 +123,7 @@ class Client {
     if (path.startsWith("/")) {
       dirs[0] = '/' + dirs[0];
     }
-    String oldCwd = this.cwd;
+    String oldCwd = _cwd;
     try {
       for (String dir in dirs) {
         try {
@@ -207,13 +186,9 @@ class Client {
 
   /// list the directories and files under given [remotePath]
   Future<List<FileInfo>> ls({String? path, int depth = 1}) async {
-    // the current path
-    if (path == null || path == ".") {
-      path = "";
-    }
     Map userHeader = {"Depth": depth};
-    HttpClientResponse response =
-        await this._send('PROPFIND', path, [207, 301], headers: userHeader);
+    HttpClientResponse response = await this
+        ._send('PROPFIND', path ?? '/', [207, 301], headers: userHeader);
     if (response.statusCode == 301) {
       return this.ls(path: response.headers.value('location'));
     }

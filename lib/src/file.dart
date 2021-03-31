@@ -76,7 +76,8 @@ List<FileInfo> treeFromWebDavXml(String xmlStr) {
           lastModified, DateTime.parse(creationTime), ""));
     });
   });
-
+  // Remove root directory
+  tree.removeAt(0);
   // Return the tree
   return tree;
 }
