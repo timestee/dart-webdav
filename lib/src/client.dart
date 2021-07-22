@@ -128,6 +128,7 @@ class Client {
       for (String dir in dirs) {
         try {
           await this.mkdir(dir, true);
+        } catch (e) {
         } finally {
           this.cd(dir);
         }
