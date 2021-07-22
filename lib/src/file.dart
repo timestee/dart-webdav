@@ -72,7 +72,7 @@ List<FileInfo> treeFromWebDavXml(String xmlStr) {
           : DateTime.fromMillisecondsSinceEpoch(0).toIso8601String();
 
       // Add the just found file to the tree
-      tree.add(new FileInfo(Uri.decodeComponent(davItemName), contentLength,
+      tree.add(new FileInfo(davItemName, contentLength,
           lastModified, DateTime.parse(creationTime), ""));
     });
   });
